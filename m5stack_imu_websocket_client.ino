@@ -121,17 +121,26 @@ void loop() {
       }
   }
 #endif
-	webSocket.loop();
-
-  static uint32_t pre_send_time = 0;
-  uint32_t time = millis();
-  if(time - pre_send_time > 5000){
-    pre_send_time = time;
-    String time_str = "Test";
-    Serial.println("SendTXT Test");
+  if(M5.BtnA.wasPressed())
+  {
+    String time_str = "BtnA pushed";
+    Serial.println("SendTXT BtnA pushed");
+    webSocket.sendTXT(time_str);
+  }
+  if(M5.BtnB.wasPressed())
+  {
+    String time_str = "BtnB pushed";
+    Serial.println("SendTXT BtnB pushed");
+    webSocket.sendTXT(time_str);
+  }
+  if(M5.BtnC.wasPressed())
+  {
+    String time_str = "BtnC pushed";
+    Serial.println("SendTXT BtnC pushed");
     webSocket.sendTXT(time_str);
   }
 
+  webSocket.loop();
 
   M5.update();
 }
