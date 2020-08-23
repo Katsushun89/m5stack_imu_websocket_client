@@ -121,25 +121,35 @@ void loop() {
       }
   }
 #endif
-  if(M5.BtnA.wasPressed())
+  bool isPressedBtnA = false;
+  bool isPressedBtnB = false;
+  bool isPressedBtnC = false;
+  if(M5.BtnA.wasPressed() || M5.BtnA.isPressed())
   {
-    String time_str = "BtnA pushed";
-    Serial.println("SendTXT BtnA pushed");
-    webSocket.sendTXT(time_str);
+    isPressedBtnA = true;
   }
-  if(M5.BtnB.wasPressed())
+  if(M5.BtnB.wasPressed() || M5.BtnB.isPressed())
   {
-    String time_str = "BtnB pushed";
-    Serial.println("SendTXT BtnB pushed");
-    webSocket.sendTXT(time_str);
+    isPressedBtnB = true;
   }
-  if(M5.BtnC.wasPressed())
+  if(M5.BtnC.wasPressed() || M5.BtnC.isPressed())
   {
-    String time_str = "BtnC pushed";
-    Serial.println("SendTXT BtnC pushed");
-    webSocket.sendTXT(time_str);
+    isPressedBtnC = true;
   }
 
+  static uint32_t pre_send_time = 0;
+  uint32_t time = millis();
+  if(time - pre_send_time > 100){
+    pre_send_time = time;
+    String isPressedBtnAStr = (isPressedBtnA ? "true": "false");
+    String isPressedBtnBStr = (isPressedBtnB ? "true": "false");
+    String isPressedBtnCStr = (isPressedBtnC ? "true": "false");
+    String btn_str = "{\"btnA\":" + isPressedBtnAStr + 
+      ", \"btnB\":" + isPressedBtnBStr + 
+      ", \"btnC\":" + isPressedBtnCStr + "}";
+    //Serial.println(btn_str);
+    webSocket.sendTXT(btn_str);
+  }
   webSocket.loop();
 
   M5.update();
