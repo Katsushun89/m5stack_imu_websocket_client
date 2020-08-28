@@ -2,6 +2,7 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include <M5Stack.h>
+#include <map>
 //#include "utility/MPU9250.h"
 #include "config.h"
 #include "imu.h"
@@ -10,6 +11,12 @@
 //MPU9250 IMU;
 WebSocketsClient webSocket;
 DynamicJsonDocument doc(1024);
+
+std::map<std::string, uint32_t> colorMap{
+    {"red", RED},
+    {"green", GREEN},
+    {"blue", BLUE}
+};
 
 void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
 	const uint8_t* src = (const uint8_t*) mem;
@@ -63,6 +70,8 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       color = parseReceivedJson(payload);
 
 			Serial.printf("color: %s\n", color.c_str());
+      //M5.Lcd.fillRect(60, 20, 200, 200, colorMap[color]);
+      M5.Lcd.fillScreen(colorMap[color]);
 			break;
 		case WStype_BIN:
 			Serial.printf("[WSc] get binary length: %u\n", length);
