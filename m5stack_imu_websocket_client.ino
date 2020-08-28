@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
+#include <ArduinoJson.h>
 #include <M5Stack.h>
 //#include "utility/MPU9250.h"
 #include "config.h"
@@ -8,6 +9,7 @@
 // Devices
 //MPU9250 IMU;
 WebSocketsClient webSocket;
+DynamicJsonDocument doc(1024);
 
 void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
 	const uint8_t* src = (const uint8_t*) mem;
@@ -22,8 +24,27 @@ void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
 	Serial.printf("\n");
 }
 
+std::string parseReceivedJson(uint8_t *payload)
+{
+  char *json = (char *)payload;
+  DeserializationError error = deserializeJson(doc, json);
+  
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.c_str());
+    return "none";
+  }
+
+  JsonObject obj = doc.as<JsonObject>();
+
+  // You can use a String to get an element of a JsonObject
+  // No duplication is done.
+  return obj[String("color")];
+}
+
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
+  std::string color;
 	switch(type) {
 		case WStype_DISCONNECTED:
 			Serial.printf("[WSc] Disconnected!\n");
@@ -39,6 +60,9 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 			// send message to server
 			// webSocket.sendTXT("message here");
+      color = parseReceivedJson(payload);
+
+			Serial.printf("color: %s\n", color.c_str());
 			break;
 		case WStype_BIN:
 			Serial.printf("[WSc] get binary length: %u\n", length);
