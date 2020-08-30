@@ -32,29 +32,28 @@ std::string parseReceivedJson(uint8_t *payload)
   return obj[String("color")];
 }
 
+void syncColor(uint8_t *payload)
+{
+  std::string color = parseReceivedJson(payload);
+
+  Serial.printf("color: %s\n", color.c_str());
+  //M5.Lcd.fillRect(60, 20, 200, 200, colorMap[color]);
+  M5.Lcd.fillScreen(colorMap[color]);
+}
+
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
-  std::string color;
 	switch(type) {
 		case WStype_DISCONNECTED:
 			Serial.printf("[WSc] Disconnected!\n");
 			break;
 		case WStype_CONNECTED:
 			Serial.printf("[WSc] Connected to url: %s\n", payload);
-
-			// send message to server when Connected
-			webSocket.sendTXT("Connected");
+			//webSocket.sendTXT("Connected");
 			break;
 		case WStype_TEXT:
 			Serial.printf("[WSc] get text: %s\n", payload);
-
-			// send message to server
-			// webSocket.sendTXT("message here");
-      color = parseReceivedJson(payload);
-
-			Serial.printf("color: %s\n", color.c_str());
-      //M5.Lcd.fillRect(60, 20, 200, 200, colorMap[color]);
-      M5.Lcd.fillScreen(colorMap[color]);
+      syncColor(payload);
 			break;
 		case WStype_BIN:
 		case WStype_ERROR:			
@@ -64,7 +63,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 		case WStype_FRAGMENT_FIN:
 			break;
 	}
-
 }
 
 void setupWiFi()
@@ -103,7 +101,6 @@ void setup()
   // Power ON Stabilizing...
   delay(500);
   M5.begin();
-  Wire.begin();
 
   setupWiFi();
   M5.Lcd.fillScreen(BLACK);
