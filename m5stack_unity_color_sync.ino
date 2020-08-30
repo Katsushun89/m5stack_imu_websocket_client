@@ -135,9 +135,9 @@ void loop() {
     String isPressedBtnAStr = (isPressedBtnA ? "true": "false");
     String isPressedBtnBStr = (isPressedBtnB ? "true": "false");
     String isPressedBtnCStr = (isPressedBtnC ? "true": "false");
-    String btn_str = "{\"btnA\":" + isPressedBtnAStr + 
-      ", \"btnB\":" + isPressedBtnBStr + 
-      ", \"btnC\":" + isPressedBtnCStr + "}";
+    String btn_str = "{\"red\":" + isPressedBtnAStr + 
+      ", \"green\":" + isPressedBtnBStr + 
+      ", \"blue\":" + isPressedBtnCStr + "}";
     //Serial.println(btn_str);
     webSocket.sendTXT(btn_str);
   }
