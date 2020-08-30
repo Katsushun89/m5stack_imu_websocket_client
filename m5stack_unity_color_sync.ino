@@ -3,12 +3,8 @@
 #include <ArduinoJson.h>
 #include <M5Stack.h>
 #include <map>
-//#include "utility/MPU9250.h"
 #include "config.h"
-#include "imu.h"
 
-// Devices
-//MPU9250 IMU;
 WebSocketsClient webSocket;
 DynamicJsonDocument doc(1024);
 
@@ -17,19 +13,6 @@ std::map<std::string, uint32_t> colorMap{
     {"green", GREEN},
     {"blue", BLUE}
 };
-
-void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
-	const uint8_t* src = (const uint8_t*) mem;
-	Serial.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
-	for(uint32_t i = 0; i < len; i++) {
-		if(i % cols == 0) {
-			Serial.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
-		}
-		Serial.printf("%02X ", *src);
-		src++;
-	}
-	Serial.printf("\n");
-}
 
 std::string parseReceivedJson(uint8_t *payload)
 {
@@ -74,12 +57,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       M5.Lcd.fillScreen(colorMap[color]);
 			break;
 		case WStype_BIN:
-			Serial.printf("[WSc] get binary length: %u\n", length);
-			hexdump(payload, length);
-
-			// send data to server
-			// webSocket.sendBIN(payload, length);
-			break;
 		case WStype_ERROR:			
 		case WStype_FRAGMENT_TEXT_START:
 		case WStype_FRAGMENT_BIN_START:
@@ -128,8 +105,6 @@ void setup()
   M5.begin();
   Wire.begin();
 
-//  initIMU(&IMU);
-
   setupWiFi();
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setTextColor(GREEN);
@@ -137,23 +112,6 @@ void setup()
 }
 
 void loop() {
-#if 0
-  if(calcIMU(&IMU)){
-      {
-        Serial.print("Yaw, Pitch, Roll: ");
-        Serial.print(IMU.yaw, 2);
-        Serial.print(", ");
-        Serial.print(IMU.pitch, 2);
-        Serial.print(", ");
-        Serial.print(IMU.roll, 2);
-      }
-      if(M5.BtnC.isPressed()){
-        sendUdp(&IMU);
-      }else{
-        Serial.println("");
-      }
-  }
-#endif
   bool isPressedBtnA = false;
   bool isPressedBtnB = false;
   bool isPressedBtnC = false;
